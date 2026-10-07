@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iris Classifier Studio • Artificial Neural Network Deep Learning</title>
+  <!-- Google Fonts: Outfit & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-3"></div>
+
+  <!-- Top Navigation Bar -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 2a10 10 0 0 0-6.88 17.23l.88-.88A8.75 8.75 0 1 1 12 20.75v-1.75"></path>
+            <circle cx="12" cy="3" r="1.5" fill="currentColor"></circle>
+            <circle cx="21" cy="12" r="1.5" fill="currentColor"></circle>
+            <circle cx="12" cy="21" r="1.5" fill="currentColor"></circle>
+            <circle cx="3" cy="12" r="1.5" fill="currentColor"></circle>
+          </svg>
+        </div>
+        <div>
+          <h1>Iris Classification Studio <span class="badge-pill">ANN Deep Learning</span></h1>
+          <p class="subtitle">Multi-Layer Artificial Neural Network (4 → 16 → 8 → 3) • 100% Test Accuracy</p>
+        </div>
+      </div>
+      <div class="header-stats">
+        <div class="stat-badge">
+          <span class="stat-label">Model Accuracy</span>
+          <span class="stat-value text-accent" id="nav-acc">100.0%</span>
+        </div>
+        <div class="stat-badge">
+          <span class="stat-label">Hidden Layers</span>
+          <span class="stat-value">2 Dense (ReLU)</span>
+        </div>
+        <div class="stat-badge">
+          <span class="stat-label">Inference Engine</span>
+          <span class="status-indicator"><span class="dot"></span> Online</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Visual Species Quick Picker Cards -->
+  <section class="species-picker-section">
+    <div class="section-title-row">
+      <h2>🌸 Explore by Botanical Species:</h2>
+      <span class="hint-text">Click any flower card below to automatically load its typical measurements and trigger live neural classification</span>
+    </div>
+    <div class="species-cards-grid">
+      <!-- Setosa Card -->
+      <div class="species-card active" id="card-setosa" data-sl="5.1" data-sw="3.5" data-pl="1.4" data-pw="0.2">
+        <div class="species-thumb-wrapper">
+          <img src="/assets/setosa.jpg" alt="Iris setosa botanical artwork" class="species-thumb">
+          <span class="badge-species setosa-badge">Class 0</span>
+        </div>
+        <div class="species-card-content">
+          <h3>Iris setosa</h3>
+          <span class="botanical-alias">Arctic / Bristle-Pointed Iris</span>
+          <div class="species-mini-specs">
+            <span>Petal: <strong>1.4 × 0.2 cm</strong></span>
+            <span>Sepal: <strong>5.1 × 3.5 cm</strong></span>
+          </div>
+          <button class="btn btn-card-load">Classify Sample ➔</button>
+        </div>
+      </div>
+
+      <!-- Versicolor Card -->
+      <div class="species-card" id="card-versicolor" data-sl="5.9" data-sw="3.0" data-pl="4.2" data-pw="1.5">
+        <div class="species-thumb-wrapper">
+          <img src="/assets/versicolor.jpg" alt="Iris versicolor botanical artwork" class="species-thumb">
+          <span class="badge-species versicolor-badge">Class 1</span>
+        </div>
+        <div class="species-card-content">
+          <h3>Iris versicolor</h3>
+          <span class="botanical-alias">Blue Flag / Harlequin Iris</span>
+          <div class="species-mini-specs">
+            <span>Petal: <strong>4.2 × 1.5 cm</strong></span>
+            <span>Sepal: <strong>5.9 × 3.0 cm</strong></span>
+          </div>
+          <button class="btn btn-card-load">Classify Sample ➔</button>
+        </div>
+      </div>
+
+      <!-- Virginica Card -->
+      <div class="species-card" id="card-virginica" data-sl="6.5" data-sw="3.0" data-pl="5.5" data-pw="1.8">
+        <div class="species-thumb-wrapper">
+          <img src="/assets/virginica.jpg" alt="Iris virginica botanical artwork" class="species-thumb">
+          <span class="badge-species virginica-badge">Class 2</span>
+        </div>
+        <div class="species-card-content">
+          <h3>Iris virginica</h3>
+          <span class="botanical-alias">Southern / Giant Blue Flag</span>
+          <div class="species-mini-specs">
+            <span>Petal: <strong>5.5 × 1.8 cm</strong></span>
+            <span>Sepal: <strong>6.5 × 3.0 cm</strong></span>
+          </div>
+          <button class="btn btn-card-load">Classify Sample ➔</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Workspace -->
+  <main class="main-layout">
+    <!-- Left Column: Input Sliders & Measurements -->
+    <section class="card glass-card input-card">
+      <div class="card-header">
+        <div class="header-title">
+          <span class="card-icon">🎛️</span>
+          <h2>Flower Morphometrics</h2>
+        </div>
+        <button class="btn btn-guide-toggle" id="btn-toggle-guide">📖 Anatomy Guide</button>
+      </div>
+
+      <p class="card-desc">Adjust sliders or type exact values to classify any custom flower measurement in real time:</p>
+      <p class="prediction-status" id="prediction-status" role="status" aria-live="polite">Ready for a flower sample.</p>
+
+      <div class="image-upload-panel">
+        <div class="upload-copy">
+          <span class="upload-kicker">Image-only classifier</span>
+          <h3>Upload a flower image</h3>
+          <p>Get a species estimate and visible flower dimensions directly from your image.</p>
+        </div>
+        <label class="upload-dropzone" for="flower-image-input" id="flower-upload-zone">
+          <input type="file" id="flower-image-input" accept="image/*">
+          <span class="upload-icon">↑</span>
+          <span><strong>Choose image</strong> or drag it here</span>
+          <small>JPG, PNG, WEBP up to 10 MB</small>
+        </label>
+        <div class="uploaded-preview" id="uploaded-preview" hidden>
+          <img id="uploaded-image" alt="Uploaded flower preview">
+          <div>
+            <span class="preview-label">Uploaded sample</span>
+            <strong id="uploaded-file-name">flower-image</strong>
+            <button class="btn btn-clear-upload" type="button" id="btn-clear-upload">Remove image</button>
+          </div>
+        </div>
+        <div class="image-analysis-result" id="image-analysis-result" hidden>
+          <div>
+            <span class="preview-label">Detected species</span>
+            <strong id="image-species">Waiting for image</strong>
+            <small id="image-confidence"></small>
+          </div>
+          <div class="image-measurement">
+            <span class="preview-label">Flower length</span>
+            <strong id="image-length">-- px</strong>
+          </div>
+          <div class="image-measurement">
+            <span class="preview-label">Flower width</span>
+            <strong id="image-width">-- px</strong>
+          </div>
+          <p class="image-scale-note">Pixel measurements describe the visible flower bounds. Add a known-size object to the photo to convert them to centimeters.</p>
+        </div>
+        <p class="image-status" id="image-status" role="status" aria-live="polite"></p>
+      </div>
+
+      <!-- Expandable Anatomy Guide -->
+      <div class="anatomy-guide-drawer" id="anatomy-drawer">
+        <img src="/assets/anatomy_guide.jpg" alt="Iris Flower Anatomy Measurement Guide" class="guide-image">
+        <div class="guide-legend">
+          <p><strong>Sepal (Fall):</strong> The outer protective petal-like leaf (Length & Width).</p>
+          <p><strong>Petal (Standard):</strong> The inner upright colorful petal (Length & Width).</p>
+        </div>
+      </div>
+
+      <!-- Feature Controls (Dual Slider + Exact Input) -->
+      <div class="sliders-list">
+        <!-- Sepal Length -->
+        <div class="slider-group">
+          <div class="slider-info">
+            <label for="sl-range">
+              <span class="feat-dot sl-dot"></span> Sepal Length
+            </label>
+            <div class="input-number-wrapper">
+              <input type="number" id="sl-num" min="4.0" max="8.0" step="0.1" value="5.1">
+              <span class="unit">cm</span>
+            </div>
+          </div>
+          <input type="range" id="sl-range" min="4.0" max="8.0" step="0.1" value="5.1">
+          <div class="slider-ticks"><span>4.0 cm</span><span>6.0 cm</span><span>8.0 cm</span></div>
+        </div>
+
+        <!-- Sepal Width -->
+        <div class="slider-group">
+          <div class="slider-info">
+            <label for="sw-range">
+              <span class="feat-dot sw-dot"></span> Sepal Width
+            </label>
+            <div class="input-number-wrapper">
+              <input type="number" id="sw-num" min="2.0" max="4.5" step="0.1" value="3.5">
+              <span class="unit">cm</span>
+            </div>
+          </div>
+          <input type="range" id="sw-range" min="2.0" max="4.5" step="0.1" value="3.5">
+          <div class="slider-ticks"><span>2.0 cm</span><span>3.25 cm</span><span>4.5 cm</span></div>
+        </div>
+
+        <!-- Petal Length -->
+        <div class="slider-group">
+          <div class="slider-info">
+            <label for="pl-range">
+              <span class="feat-dot pl-dot"></span> Petal Length
+            </label>
+            <div class="input-number-wrapper">
+              <input type="number" id="pl-num" min="1.0" max="7.0" step="0.1" value="1.4">
+              <span class="unit">cm</span>
+            </div>
+          </div>
+          <input type="range" id="pl-range" min="1.0" max="7.0" step="0.1" value="1.4">
+          <div class="slider-ticks"><span>1.0 cm</span><span>4.0 cm</span><span>7.0 cm</span></div>
+        </div>
+
+        <!-- Petal Width -->
+        <div class="slider-group">
+          <div class="slider-info">
+            <label for="pw-range">
+              <span class="feat-dot pw-dot"></span> Petal Width
+            </label>
+            <div class="input-number-wrapper">
+              <input type="number" id="pw-num" min="0.1" max="2.5" step="0.1" value="0.2">
+              <span class="unit">cm</span>
+            </div>
+          </div>
+          <input type="range" id="pw-range" min="0.1" max="2.5" step="0.1" value="0.2">
+          <div class="slider-ticks"><span>0.1 cm</span><span>1.3 cm</span><span>2.5 cm</span></div>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="action-buttons-row">
+        <button class="btn btn-action" id="btn-random-sample">🎲 Random Flower Sample</button>
+        <button class="btn btn-action btn-reset" id="btn-reset-values">🔄 Reset Default</button>
+      </div>
+
+      <!-- Standardized Z-Score Inspector -->
+      <div class="standardization-panel">
+        <div class="panel-header">
+          <span>Standardized Network Inputs ($Z_j = \frac{x_j - \mu_j}{\sigma_j}$):</span>
+        </div>
+        <div class="norm-tags" id="norm-tags">
+          <span class="norm-tag">Z₁: -0.89</span>
+          <span class="norm-tag">Z₂: +1.02</span>
+          <span class="norm-tag">Z₃: -1.34</span>
+          <span class="norm-tag">Z₄: -1.31</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Visual Prediction Result & Live Neural Network Diagram -->
+    <div class="right-stack">
+      <!-- Live Classification Card with Dynamic Botanical Art -->
+      <section class="card glass-card prediction-card" id="prediction-panel">
+        <div class="prediction-layout">
+          <!-- Visual Botanical Art Presentation -->
+          <div class="prediction-artwork-container">
+            <img src="/assets/setosa.jpg" alt="Classified Flower Species" id="pred-flower-img" class="classified-flower-image">
+            <div class="winner-glow-overlay"></div>
+          </div>
+
+          <!-- Prediction Meta & Confidence -->
+          <div class="prediction-meta-container">
+            <div class="prediction-top-bar">
+              <span class="section-tag">ANN Prediction Outcome</span>
+              <div class="confidence-circle" id="conf-badge">
+                <span class="conf-percent" id="pred-confidence">99.9%</span>
+                <span class="conf-sub">Confidence</span>
+              </div>
+            </div>
+
+            <h2 id="pred-species-name">Iris Setosa</h2>
+            <div class="species-badge-row">
+              <span class="species-alias-tag" id="pred-alias">Arctic / Bristle-Pointed Iris</span>
+              <span class="species-family-tag">Family: Iridaceae</span>
+            </div>
+            <p id="pred-botanical-desc">Identified by conspicuously small petals (1.0-1.9 cm) and distinct sepal length-to-width ratio.</p>
+
+            <!-- Probability Distribution Meters -->
+            <div class="probabilities-container">
+              <div class="prob-row" id="row-setosa">
+                <div class="prob-meta">
+                  <span class="species-title">🌸 Iris setosa</span>
+                  <span class="prob-num" id="prob-val-setosa">99.9%</span>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill fill-setosa" id="prob-bar-setosa" style="width: 99.9%;"></div>
+                </div>
+              </div>
+
+              <div class="prob-row" id="row-versicolor">
+                <div class="prob-meta">
+                  <span class="species-title">🌺 Iris versicolor</span>
+                  <span class="prob-num" id="prob-val-versicolor">0.1%</span>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill fill-versicolor" id="prob-bar-versicolor" style="width: 0.1%;"></div>
+                </div>
+              </div>
+
+              <div class="prob-row" id="row-virginica">
+                <div class="prob-meta">
+                  <span class="species-title">🪻 Iris virginica</span>
+                  <span class="prob-num" id="prob-val-virginica">0.0%</span>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill fill-virginica" id="prob-bar-virginica" style="width: 0.0%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Interactive Neural Network Visualization -->
+      <section class="card glass-card network-card">
+        <div class="card-header">
+          <div class="header-title">
+            <span class="card-icon">🧠</span>
+            <h2>Dynamic Artificial Neural Network Flow</h2>
+          </div>
+          <div class="graph-legend">
+            <span class="legend-item"><span class="legend-dot in-dot"></span> Input (4)</span>
+            <span class="legend-item"><span class="legend-dot h1-dot"></span> Dense 1: 16 (ReLU)</span>
+            <span class="legend-item"><span class="legend-dot h2-dot"></span> Dense 2: 8 (ReLU)</span>
+            <span class="legend-item"><span class="legend-dot out-dot"></span> Softmax (3)</span>
+          </div>
+        </div>
+
+        <div class="network-viewport">
+          <svg id="ann-svg" viewBox="0 0 760 310" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+
+        <div class="network-footer">
+          <div class="layer-pill">Input: 4 Features</div>
+          <div class="arrow-pill">➔</div>
+          <div class="layer-pill">Dense 1: 16 Neurons (He Normal + ReLU)</div>
+          <div class="arrow-pill">➔</div>
+          <div class="layer-pill">Dense 2: 8 Neurons (He Normal + ReLU)</div>
+          <div class="arrow-pill">➔</div>
+          <div class="layer-pill">Output: 3 Classes (Softmax)</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Deep Learning Analytics & Research Tabs -->
+  <section class="analytics-section">
+    <div class="tabs-header">
+      <button class="tab-btn active" data-tab="tab-visuals">📊 Generated Visualizations</button>
+      <button class="tab-btn" data-tab="tab-metrics">🎯 Confusion Matrix & Metrics</button>
+      <button class="tab-btn" data-tab="tab-math">📐 Mathematical Formulations</button>
+      <button class="tab-btn" data-tab="tab-viva">🎓 Viva Voce Exam Q&A</button>
+    </div>
+
+    <!-- Tab 1: Visualizations Gallery -->
+    <div class="tab-pane active" id="tab-visuals">
+      <div class="visuals-grid">
+        <div class="visual-card">
+          <div class="visual-card-header">
+            <h3>Training Dynamics & Convergence</h3>
+            <span class="card-badge">220 Epochs</span>
+          </div>
+          <p>Training and validation loss with accuracy convergence over 220 epochs.</p>
+          <img src="/results/training_curves.png" alt="ANN Training Curves" class="zoomable-img">
+        </div>
+        <div class="visual-card">
+          <div class="visual-card-header">
+            <h3>Test Confusion Matrix Heatmap</h3>
+            <span class="card-badge">100% Precision</span>
+          </div>
+          <p>Annotated test confusion matrix showing zero false positives or negatives.</p>
+          <img src="/results/confusion_matrix.png" alt="Confusion Matrix Heatmap" class="zoomable-img">
+        </div>
+        <div class="visual-card">
+          <div class="visual-card-header">
+            <h3>Non-Linear Decision Boundaries</h3>
+            <span class="card-badge">2D Projection</span>
+          </div>
+          <p>Contour classification regions learned by the multi-layer neural network.</p>
+          <img src="/results/decision_boundary.png" alt="Decision Boundaries" class="zoomable-img">
+        </div>
+        <div class="visual-card">
+          <div class="visual-card-header">
+            <h3>Feature Distributions by Species</h3>
+            <span class="card-badge">Morphometrics</span>
+          </div>
+          <p>Boxplots highlighting the variance of the 4 features across species.</p>
+          <img src="/results/feature_distributions.png" alt="Feature Distributions" class="zoomable-img">
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Metrics Table -->
+    <div class="tab-pane" id="tab-metrics">
+      <div class="metrics-grid">
+        <div class="metric-box">
+          <span class="m-val text-green">100.0%</span>
+          <span class="m-label">Overall Test Accuracy</span>
+        </div>
+        <div class="metric-box">
+          <span class="m-val text-blue">1.0000</span>
+          <span class="m-label">Macro Precision</span>
+        </div>
+        <div class="metric-box">
+          <span class="m-val text-purple">1.0000</span>
+          <span class="m-label">Macro Recall</span>
+        </div>
+        <div class="metric-box">
+          <span class="m-val text-pink">1.0000</span>
+          <span class="m-label">Macro F1-Score</span>
+        </div>
+      </div>
+
+      <div class="table-container glass-card">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Species Class</th>
+              <th>Precision</th>
+              <th>Recall</th>
+              <th>F1-Score</th>
+              <th>True Positives (TP)</th>
+              <th>False Positives (FP)</th>
+              <th>Support (Test Partition)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>🌸 <strong>Iris setosa</strong></td>
+              <td>1.0000</td>
+              <td>1.0000</td>
+              <td>1.0000</td>
+              <td>10</td>
+              <td>0</td>
+              <td>10 (33.3%)</td>
+            </tr>
+            <tr>
+              <td>🌺 <strong>Iris versicolor</strong></td>
+              <td>1.0000</td>
+              <td>1.0000</td>
+              <td>1.0000</td>
+              <td>10</td>
+              <td>0</td>
+              <td>10 (33.3%)</td>
+            </tr>
+            <tr>
+              <td>🪻 <strong>Iris virginica</strong></td>
+              <td>1.0000</td>
+              <td>1.0000</td>
+              <td>1.0000</td>
+              <td>10</td>
+              <td>0</td>
+              <td>10 (33.3%)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 3: Mathematical Foundations -->
+    <div class="tab-pane" id="tab-math">
+      <div class="math-grid">
+        <div class="math-card glass-card">
+          <h4>1. Forward Propagation Equation</h4>
+          <p>For each layer $l \in \{1, 2, 3\}$:</p>
+          <div class="formula-box">
+            $$Z^{[l]} = A^{[l-1]} W^{[l]} + b^{[l]}$$
+            $$A^{[l]} = g^{[l]}(Z^{[l]})$$
+          </div>
+          <p class="math-note">Where $g^{[1]}, g^{[2]}$ are ReLU, and $g^{[3]}$ is the Softmax operator.</p>
+        </div>
+
+        <div class="math-card glass-card">
+          <h4>2. Softmax Activation Function</h4>
+          <p>Converts arbitrary logits into valid normalized class probabilities:</p>
+          <div class="formula-box">
+            $$\sigma(Z_i) = \frac{e^{Z_i - \max(Z)}}{\sum_{j=1}^3 e^{Z_j - \max(Z)}}$$
+          </div>
+          <p class="math-note">Includes $\max(Z)$ subtraction to guarantee numeric stability against exponential overflow.</p>
+        </div>
+
+        <div class="math-card glass-card">
+          <h4>3. Categorical Cross-Entropy Loss</h4>
+          <p>Penalizes confident misclassifications logarithmically:</p>
+          <div class="formula-box">
+            $$\mathcal{L} = -\frac{1}{N} \sum_{i=1}^N \sum_{k=1}^3 y_{i,k} \log(\hat{y}_{i,k}) + \frac{\lambda}{2} \sum_l \|W^{[l]}\|_F^2$$
+          </div>
+          <p class="math-note">With $L_2$ weight regularization ($\lambda = 0.001$) to prevent over-fitting.</p>
+        </div>
+
+        <div class="math-card glass-card">
+          <h4>4. Backpropagation Gradient</h4>
+          <p>Combined Softmax and Cross-Entropy loss derivative simplifies to:</p>
+          <div class="formula-box">
+            $$\frac{\partial \mathcal{L}}{\partial Z^{[3]}} = \frac{1}{N} (\hat{Y} - Y)$$
+            $$\frac{\partial \mathcal{L}}{\partial W^{[l]}} = (A^{[l-1]})^T \frac{\partial \mathcal{L}}{\partial Z^{[l]}} + \lambda W^{[l]}$$
+          </div>
+          <p class="math-note">Passed recursively through hidden layers using the activation Jacobian.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Viva Voce Prep -->
+    <div class="tab-pane" id="tab-viva">
+      <div class="viva-accordion">
+        <div class="viva-item">
+          <div class="viva-question">Q1: Why use an Artificial Neural Network (ANN) instead of a simple Linear Classifier?</div>
+          <div class="viva-answer">Iris Versicolor and Virginica have slight morphological overlap in feature space. While Setosa is linearly separable, separating Versicolor from Virginica requires a non-linear decision boundary. The multi-layer ANN with ReLU activations learns high-order non-linear combinations of sepal and petal ratios.</div>
+        </div>
+
+        <div class="viva-item">
+          <div class="viva-question">Q2: Why is Feature Standardization (Z-score) necessary before feeding data to the ANN?</div>
+          <div class="viva-answer">Features have varying numerical scales (e.g. Sepal Length spans 4.3–7.9 cm while Petal Width is 0.1–2.5 cm). Without scaling, the gradient updates would oscillate along features with larger variance, slowing down or preventing optimal convergence. Z-score scaling ($z = \frac{x - \mu}{\sigma}$) centers gradients for smooth Adam optimization.</div>
+        </div>
+
+        <div class="viva-item">
+          <div class="viva-question">Q3: What role does the Adam Optimizer play over standard SGD?</div>
+          <div class="viva-answer">Adam (Adaptive Moment Estimation) maintains both exponentially decaying first moments (momentum) and second moments (uncentered variance of gradients). This dynamically scales the learning rate per individual parameter, allowing swift progress across flat plateaus and avoiding divergence in steep ravines.</div>
+        </div>
+
+        <div class="viva-item">
+          <div class="viva-question">Q4: Why use He (Kaiming) initialization for ReLU layers and Xavier for Softmax?</div>
+          <div class="viva-answer">Because ReLU zeros out all negative inputs, it reduces variance by half. He initialization scales weights by $\sqrt{2 / n_{in}}$, preventing activation variances from exploding or vanishing across deep forward passes. Xavier scales by $\sqrt{2 / (n_{in} + n_{out})}$, optimal for symmetric linear/softmax transitions.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>Iris Flower Classification using Artificial Neural Network (ANN) • Deep Learning Mini Project</p>
+    <p class="footer-sub">Designed for Academic Review, Interactive Demonstration & Viva Voce Defense</p>
+  </footer>
+
+  <!-- Modal for Fullscreen Image Zoom -->
+  <div class="modal" id="image-modal">
+    <div class="modal-content">
+      <span class="modal-close" id="modal-close">&times;</span>
+      <img id="modal-img" src="" alt="Zoomed Plot">
+      <div class="modal-caption" id="modal-caption"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
