@@ -133,6 +133,5 @@ def main():
     print(f"\nTraining pipeline completed successfully in {total_time:.2f} seconds!")
     print(f"Final Test Accuracy: {metrics['accuracy'] * 100:.2f}%\n")
 
-
 if __name__ == "__main__":
     main()
